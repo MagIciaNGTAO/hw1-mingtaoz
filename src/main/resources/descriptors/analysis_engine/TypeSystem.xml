@@ -18,7 +18,7 @@
       </features>
     </typeDescription>
     <typeDescription>
-    <name>edu.cmu.mingtaoz.type.Regex</name>
+      <name>edu.cmu.mingtaoz.type.Regex</name>
       <description/>
       <supertypeName>uima.tcas.Annotation</supertypeName>
       <features>

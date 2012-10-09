@@ -8,7 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
+import org.apache.uima.UimaContext;
+import org.apache.uima.analysis_component.AnalysisComponent;
 import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.jcas.JCas;
@@ -25,77 +28,140 @@ import edu.stanford.nlp.util.CoreMap;
 
 /**
  * @author mingtaozhang
- *
+ * 
  */
 public class PosTagNamedEntityRecognizerAnnotator extends JCasAnnotator_ImplBase {
 
-    private StanfordCoreNLP pipeline;
+  private StanfordCoreNLP pipeline;
 
-    public PosTagNamedEntityRecognizerAnnotator() throws ResourceInitializationException {
-      Properties props = new Properties();
-      props.put("annotators", "tokenize, ssplit, pos");
-      pipeline = new StanfordCoreNLP(props);
+  private int windowSize;
+
+  /**
+   * @see AnalysisComponent#initialize(UimaContext)
+   */
+  public void initialize(UimaContext aContext) throws ResourceInitializationException {
+    super.initialize(aContext);
+    Properties props = new Properties();
+    props.put("annotators", "tokenize, ssplit, pos");
+    pipeline = new StanfordCoreNLP(props);
+    windowSize = (Integer) aContext.getConfigParameterValue("windowSize");
+  }
+
+  class Position {
+    String content;
+    int begin;
+    int end;
+
+    public Position(String content, int begin, int end) {
+      this.content = content;
+      this.begin = begin;
+      this.end = end;
     }
+  }
 
-    public Map<Integer, Integer> getGeneSpans(String text) {
-      Map<Integer, Integer> begin2end = new HashMap<Integer, Integer>();
-      Annotation document = new Annotation(text);
-      pipeline.annotate(document);
-      List<CoreMap> sentences = document.get(SentencesAnnotation.class);
-      for (CoreMap sentence : sentences) {
+  public Map<Integer, Position> getGeneSpans(String text) {
+    Map<Integer, Position> begin2end = new HashMap<Integer, Position>();
+    Annotation document = new Annotation(text);
+    pipeline.annotate(document);
+    List<CoreMap> sentences = document.get(SentencesAnnotation.class);
+    for (CoreMap sentence : sentences) {
+      List<CoreLabel> candidate = new ArrayList<CoreLabel>();
+      for (CoreLabel token : sentence.get(TokensAnnotation.class)) {
+        String pos = token.get(PartOfSpeechAnnotation.class);
+        if (pos.startsWith("NN") || pos.startsWith("JJ") || pos.startsWith("FW")) {
+          candidate.add(token);
+        } else if (candidate.size() > 0) {
+          int begin = candidate.get(0).beginPosition();
+          int end = candidate.get(candidate.size() - 1).endPosition();
+          
+          StringBuilder temp = new StringBuilder();
+          for (CoreLabel c : candidate) {
+            temp.append(c.originalText()).append(" ");
+          }
+          String tempResult = temp.toString();
+          begin2end.put(begin+end, new Position(tempResult.substring(0, tempResult.length() - 1), begin, end));
+          candidate.clear();
+        }
+        
+        if (pos.startsWith("NN")) {
+          int begin = token.beginPosition();
+          int end = token.endPosition();
+          begin2end.put(begin+end, new Position(token.originalText(), begin, end));
+        }
+      }
+      if (candidate.size() > 0) {
+        int begin = candidate.get(0).beginPosition();
+        int end = candidate.get(candidate.size() - 1).endPosition();
+        StringBuilder temp = new StringBuilder();
+        for (CoreLabel c : candidate) {
+          temp.append(c.originalText()).append(" ");
+        }
+        String tempResult = temp.toString();
+        begin2end.put(begin+end, new Position(tempResult.substring(0, tempResult.length() - 1), begin, end));
+        candidate.clear();
+      }
+    }
+    return begin2end;
+  }
+  
+  /*
+  public Map<Integer, Position> getGeneSpans(String text) {
+    // Map<Integer, Integer> begin2end = new HashMap<Integer, Integer>();
+    Map<Integer, Position> begin2end = new HashMap<Integer, Position>();
+    Annotation document = new Annotation(text);
+    pipeline.annotate(document);
+    List<CoreMap> sentences = document.get(SentencesAnnotation.class);
+    for (CoreMap sentence : sentences) {
+      for(int i=1; i< windowSize; i++){
+        // we do this for different window sizes
         List<CoreLabel> candidate = new ArrayList<CoreLabel>();
+        int count = 0;
         for (CoreLabel token : sentence.get(TokensAnnotation.class)) {
           String pos = token.get(PartOfSpeechAnnotation.class);
-          //if (!pos.startsWith("CC") && !pos.startsWith("VBD") && !pos.startsWith("RB")
-          //    && !pos.startsWith("DT") && !pos.startsWith("IN") && !pos.startsWith("CD")) {
-          if(pos.startsWith("NN") || pos.startsWith("JJ") || pos.startsWith("FW")){
+          if (pos.startsWith("NN") || pos.startsWith("JJ") || pos.startsWith("FW") && count < i) {
             candidate.add(token);
+            count++;
           } else if (candidate.size() > 0) {
             int begin = candidate.get(0).beginPosition();
             int end = candidate.get(candidate.size() - 1).endPosition();
-            begin2end.put(begin, end);
+            StringBuilder temp = new StringBuilder();
+            for (CoreLabel c : candidate) {
+              temp.append(c.originalText()).append(" ");
+            }
+            String tempResult = temp.toString();
+            begin2end.put(begin + end, new Position(tempResult.substring(0, tempResult.length() - 1), begin, end));
             candidate.clear();
           }
-          if(pos.startsWith("NN")){
-            //candidate.add(token);
-            //} else if (candidate.size() > 0) {
-            int begin = token.beginPosition();
-            int end = token.endPosition();
-            begin2end.put(begin, end);
-            //candidate.clear();
-          }
         }
+  
         if (candidate.size() > 0) {
           int begin = candidate.get(0).beginPosition();
           int end = candidate.get(candidate.size() - 1).endPosition();
-          begin2end.put(begin, end);
+          StringBuilder temp = new StringBuilder();
+          for (CoreLabel c : candidate) {
+            temp.append(c.originalText()).append(" ");
+          }
+          String tempResult = temp.toString();
+          begin2end.put(begin + end, new Position(tempResult.substring(0, tempResult.length() - 1), begin, end));
           candidate.clear();
         }
       }
-      return begin2end;
     }
+    return begin2end;
+  }
+  */
 
-    public void process(JCas aJCas) throws AnalysisEngineProcessException {
-      // get document text
-      String docText = aJCas.getDocumentText();
-      Map<Integer, Integer> result = getGeneSpans(docText);
-      for(int i : result.keySet()){
-        POS annotation = new POS(aJCas);
-        annotation.setBegin(i);
-        annotation.setEnd(result.get(i));
-        annotation.setPartOfSpeech(docText.substring(i, result.get(i)));
-        annotation.addToIndexes();
-      }
+  public void process(JCas aJCas) throws AnalysisEngineProcessException {
+    // get document text
+    String docText = aJCas.getDocumentText();
+    Map<Integer, Position> result = getGeneSpans(docText);
+    for (int sum : result.keySet()) {
+      POS annotation = new POS(aJCas);
+      annotation.setBegin(result.get(sum).begin);
+      annotation.setEnd(result.get(sum).end);
+      annotation.setPartOfSpeech(result.get(sum).content);
+      // System.out.println(s);
+      annotation.addToIndexes();
     }
-    
-    /*
-    public static void main(String[] args) throws ResourceInitializationException{
-      String test = "When CSF [HCO3-] is shown as a function of CSF PCO2 the data of K-depleted rats are no longer displaced when compared to controls but still have a significantly greater slope (1.21 +/- 0.23 vs.";
-      Map<Integer, Integer> m = new PosTagNamedEntityRecognizerAnnotator().getGeneSpans(test);
-      for(int i:m.keySet()){
-        //System.out.println(i + "-" + m.get(i));
-        System.out.println(test.substring(i, m.get(i)));
-      }
-    }
-    */
+  }
 }

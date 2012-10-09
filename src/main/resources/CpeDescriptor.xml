@@ -57,6 +57,8 @@
             </errorHandling>
             <checkpoint batch="10000"/>
         </casProcessor>
+
+        <!--
         <casProcessor deployment="integrated" name="Regular Expression Based on Given Feature">
             <descriptor>
                 <import location="descriptors/analysis_engine/RegularExpressionBasedAnnotator.xml"/>
@@ -70,9 +72,10 @@
             </errorHandling>
             <checkpoint batch="10000"/>
         </casProcessor>
+        -->
         <casProcessor deployment="integrated" name="Sample Writer CAS Consumer">
             <descriptor>
-                <import location="descriptors/cas_consumer/SampleWriterCasConsumer.xml"/>
+                <import location="descriptors/cas_consumer/SampleWriterAndEvaluatorCasConsumer.xml"/>
             </descriptor>
             <deploymentParameters/>
             <filter></filter>
