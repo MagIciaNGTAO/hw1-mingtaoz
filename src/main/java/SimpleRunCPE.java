@@ -103,16 +103,6 @@ public class SimpleRunCPE extends Thread {
   }
 
   /**
-   * main class.
-   * 
-   * @param args
-   *          Command line arguments - see class description
-   */
-  public static void main(String[] args) throws Exception {
-    new SimpleRunCPE(args);
-  }
-
-  /**
    * Callback Listener. Receives event notifications from CPE.
    * 
    * 
@@ -229,4 +219,13 @@ public class SimpleRunCPE extends Thread {
     }
   }
 
+  /**
+   * main class.
+   * 
+   * @param args
+   *          Command line arguments - see class description
+   */
+  public static void main(String[] args) throws Exception {
+    new SimpleRunCPE(args);
+  }
 }
