@@ -46,7 +46,7 @@
         </casProcessor>
         <casProcessor deployment="integrated" name="Result Writing CAS Consumer">
             <descriptor>
-                <import location="descriptors/cas_consumer/SampleWriterAndEvaluatorCasConsumer.xml"/>
+                <import location="descriptors/cas_consumer/SampleWriterCasConsumer.xml"/>
             </descriptor>
             <deploymentParameters/>
             <filter></filter>
