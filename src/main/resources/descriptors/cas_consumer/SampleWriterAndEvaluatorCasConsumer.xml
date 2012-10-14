@@ -25,10 +25,10 @@
   <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
   <implementationName>edu.cmu.mingtaoz.casconsumer.SampleWriterAndEvaluatorCasConsumer</implementationName>
   <processingResourceMetaData>
-    <name>Xmi Writer CAS Consumer</name>
-    <description>Writes the CAS to XMI format</description>
+    <name>Writer CAS Consumer</name>
+    <description>Writes the CAS file as sample.out format</description>
     <version>1.0</version>
-    <vendor>The Apache Software Foundation</vendor>
+    <vendor>Mingtao Zhang</vendor>
     <configurationParameters>
       <configurationParameter>
         <name>OutputDirectory</name>
@@ -59,20 +59,6 @@
         </value>
       </nameValuePair>
     </configurationParameterSettings>
-    <typeSystemDescription>
-      <imports>
-        <import name="src/main/resources/descriptors/collection_reader/SourceDocumentInformation"/>
-      </imports>
-    </typeSystemDescription>
-    <capabilities>
-      <capability>
-        <inputs>
-          <type allAnnotatorFeatures="true">edu.cmu.mingtaoz.cpe.SourceDocumentInformation</type>
-        </inputs>
-        <outputs/>
-        <languagesSupported/>
-      </capability>
-    </capabilities>
     <operationalProperties>
       <modifiesCas>false</modifiesCas>
       <multipleDeploymentAllowed>true</multipleDeploymentAllowed>

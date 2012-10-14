@@ -52,6 +52,7 @@ public class PosTagNamedEntityRecognizer {
     return begin2end;
   }
   
+  /*
   public static void main(String[] args) throws ResourceInitializationException{
     String test = "When CSF [HCO3-] is shown as a function of CSF PCO2 the data of K-depleted rats are no longer displaced when compared to controls but still have a significantly greater slope (1.21 +/- 0.23 vs.";
     Map<Integer, Integer> m = new PosTagNamedEntityRecognizer().getGeneSpans(test);
@@ -60,4 +61,5 @@ public class PosTagNamedEntityRecognizer {
       System.out.println(test.substring(i, m.get(i)));
     }
   }
+  */
 }

@@ -29,24 +29,11 @@
             </descriptor>
         </collectionIterator>
     </collectionReader>
-    <casProcessors casPoolSize="2" processingUnitThreadCount="1">
-		<casProcessor deployment="integrated" name="Simple Tag and Sentence Annotator">
-	        <descriptor>
-                <import location ="descriptors/analysis_engine/TagSentenceAnnotator.xml"/>
-            </descriptor>
-            <deploymentParameters/>
-            <filter></filter>
-            <errorHandling>
-                <errorRateThreshold action="terminate" value="100/1000"/>
-                <maxConsecutiveRestarts action="terminate" value="30"/>
-                <timeout max="100000"/>
-            </errorHandling>
-            <checkpoint batch="10000"/>
-        </casProcessor>
-        
-		<casProcessor deployment="integrated" name="Part of Speech from Stanford">
+    
+    <casProcessors casPoolSize="2" processingUnitThreadCount="1">    	
+		<casProcessor deployment="integrated" name="Lingpipe">
             <descriptor>
-                <import location="descriptors/analysis_engine/PosTagNamedEntityRecognizerAnnotator.xml"/>
+                <import location="descriptors/analysis_engine/LinepipeWrapperAnnotator.xml"/>
             </descriptor>
             <deploymentParameters/>
             <filter></filter>
@@ -57,25 +44,22 @@
             </errorHandling>
             <checkpoint batch="10000"/>
         </casProcessor>
-
-        <!--
-        <casProcessor deployment="integrated" name="Regular Expression Based on Given Feature">
-            <descriptor>
-                <import location="descriptors/analysis_engine/RegularExpressionBasedAnnotator.xml"/>
-            </descriptor>
-            <deploymentParameters/>
-            <filter></filter>
-            <errorHandling>
-                <errorRateThreshold action="terminate" value="100/1000"/>
-                <maxConsecutiveRestarts action="terminate" value="30"/>
-                <timeout max="100000"/>
-            </errorHandling>
-            <checkpoint batch="10000"/>
-        </casProcessor>
-        -->
-        <casProcessor deployment="integrated" name="Sample Writer CAS Consumer">
+        <casProcessor deployment="integrated" name="Result Writing CAS Consumer">
             <descriptor>
                 <import location="descriptors/cas_consumer/SampleWriterAndEvaluatorCasConsumer.xml"/>
+            </descriptor>
+            <deploymentParameters/>
+            <filter></filter>
+            <errorHandling>
+                <errorRateThreshold action="terminate" value="100/1000"/>
+                <maxConsecutiveRestarts action="terminate" value="30"/>
+                <timeout max="10000"/>
+            </errorHandling>
+            <checkpoint batch="10000"/>
+        </casProcessor>
+        <casProcessor deployment="integrated" name="Result Evaluation Consumer">
+            <descriptor>
+                <import location="descriptors/cas_consumer/ResultEvaluationCasConsumer.xml"/>
             </descriptor>
             <deploymentParameters/>
             <filter></filter>

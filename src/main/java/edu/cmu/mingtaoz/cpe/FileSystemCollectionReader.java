@@ -27,16 +27,13 @@ import org.apache.uima.cas.CASException;
 import org.apache.uima.collection.CollectionException;
 import org.apache.uima.collection.CollectionReader_ImplBase;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.jcas.tcas.DocumentAnnotation;
-import org.apache.uima.resource.ResourceConfigurationException;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.FileUtils;
 import org.apache.uima.util.Progress;
 import org.apache.uima.util.ProgressImpl;
 
 /**
- * A simple collection reader that reads documents from a directory in the filesystem. It can be
- * configured with the following parameters:
+ * A simple collection reader that read a single input file and produce CASes based on per line from the document
  * <ul>
  * <li><code>InputDirectory</code> - path to directory containing files</li>
  * <li><code>Encoding</code> (optional) - character encoding of the input files</li>
@@ -69,76 +66,43 @@ public class FileSystemCollectionReader extends CollectionReader_ImplBase {
    * input directory. If specified this information will be added to the CAS.
    */
   public static final String PARAM_LANGUAGE = "Language";
-
-  /**
-   * Name of optional configuration parameter that indicates including
-   * the subdirectories (recursively) of the current input directory.
-   */
-  public static final String PARAM_SUBDIR = "BrowseSubdirectories";
   
-  //private ArrayList<File> mFiles;
   private File mFile;
 
-  private String mEncoding;
-
-  private String mLanguage;
+  private String[] content;
   
-  private Boolean mRecursive;
+  private String mEncoding;
+  
+  private int numberOfLines;
 
   private int mCurrentIndex;
 
   /**
-   * @see org.apache.uima.collection.CollectionReader_ImplBase#initialize()
+   * 
+   * initialized the collection reader, read the file and initilize several private members
+   * 
    */
   public void initialize() throws ResourceInitializationException {
-    //File directory = new File(((String) getConfigParameterValue(PARAM_INPUTDIR)).trim());
     File directory = new File(((String) getConfigParameterValue(PARAM_INPUTDIR)));
     mEncoding  = (String) getConfigParameterValue(PARAM_ENCODING);
-    mLanguage  = (String) getConfigParameterValue(PARAM_LANGUAGE);
-    mRecursive = (Boolean) getConfigParameterValue(PARAM_SUBDIR);
-    if (null == mRecursive) { // could be null if not set, it is optional
-      mRecursive = Boolean.FALSE;
-    }
-    mCurrentIndex = 0;
-
-    // if input directory does not exist or is not a directory, throw exception
-    if (!directory.exists() || !directory.isDirectory()) {
-      throw new ResourceInitializationException(ResourceConfigurationException.DIRECTORY_NOT_FOUND,
-              new Object[] { PARAM_INPUTDIR, this.getMetaData().getName(), directory.getPath() });
-    }
-
-    // get list of files in the specified directory, and subdirectories if the
-    // parameter PARAM_SUBDIR is set to True
     mFile = new File(directory + "/" + (String) getConfigParameterValue(PARAM_INPUTFILE));
-    //addFilesFromDir(directory);
-  }
-  
-  /**
-   * This method adds files in the directory passed in as a parameter to mFiles.
-   * If mRecursive is true, it will include all files in all
-   * subdirectories (recursively), as well. 
-   * 
-   * @param dir
-   
-  private void addFilesFromDir(File dir) {
-    File[] files = dir.listFiles();
-    for (int i = 0; i < files.length; i++) {
-      if (!files[i].isDirectory()) {
-        mFiles.add(files[i]);
-      } else if (mRecursive) {
-        addFilesFromDir(files[i]);
-      }
+    mCurrentIndex = 0;
+    String text = null;
+    try {
+      text = FileUtils.file2String(mFile, mEncoding);
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
     }
+    content = text.split("\n");
+    numberOfLines = content.length;
   }
-  */
 
   /**
    * @see org.apache.uima.collection.CollectionReader#hasNext()
    */
   public boolean hasNext() {
-    //return mCurrentIndex < mFiles.size();
-    // specified with 1 because we only have sample.in or hw1.in to deal with
-    return mCurrentIndex < 1;
+    return mCurrentIndex < numberOfLines;
   }
 
   /**
@@ -151,35 +115,7 @@ public class FileSystemCollectionReader extends CollectionReader_ImplBase {
     } catch (CASException e) {
       throw new CollectionException(e);
     }
-
-    // open input stream to file
-    //File file = (File) mFiles.get(mCurrentIndex++);
-    mCurrentIndex++;
-    String text = FileUtils.file2String(mFile, mEncoding);
-      // put document in CAS
-    jcas.setDocumentText(text);
-
-    // set language if it was explicitly specified as a configuration parameter
-    if (mLanguage != null) {
-      ((DocumentAnnotation) jcas.getDocumentAnnotationFs()).setLanguage(mLanguage);
-    }
-
-    // Also store location of source document in CAS. This information is critical
-    // if CAS Consumers will need to know where the original document contents are located.
-    // For example, the Semantic Search CAS Indexer writes this information into the
-    // search index that it creates, which allows applications that use the search index to
-    // locate the documents that satisfy their semantic queries.
-    
-    // TODO remove if we don't need for Homework #1
-    
-    SourceDocumentInformation srcDocInfo = new SourceDocumentInformation(jcas);
-    srcDocInfo.setUri(mFile.getAbsoluteFile().toURL().toString());
-    srcDocInfo.setOffsetInSource(0);
-    srcDocInfo.setDocumentSize((int) mFile.length());
-    //srcDocInfo.setLastSegment(mCurrentIndex == mFiles.size());
-    srcDocInfo.setLastSegment(true);
-    srcDocInfo.addToIndexes();
-    
+    jcas.setDocumentText(content[mCurrentIndex++]);
   }
 
   /**
@@ -192,19 +128,6 @@ public class FileSystemCollectionReader extends CollectionReader_ImplBase {
    * @see org.apache.uima.collection.base_cpm.BaseCollectionReader#getProgress()
    */
   public Progress[] getProgress() {
-    //return new Progress[] { new ProgressImpl(mCurrentIndex, mFiles.size(), Progress.ENTITIES) };
-    return new Progress[] { new ProgressImpl(mCurrentIndex, 1, Progress.ENTITIES) };
+    return new Progress[] { new ProgressImpl(mCurrentIndex, numberOfLines, Progress.ENTITIES) };
   }
-
-  /**
-   * Gets the total number of documents that will be returned by this collection reader. This is not
-   * part of the general collection reader interface.
-   * 
-   * @return the number of documents in the collection
-   */
-  public int getNumberOfDocuments() {
-    //return mFiles.size();
-    return 1;
-  }
-
 }
