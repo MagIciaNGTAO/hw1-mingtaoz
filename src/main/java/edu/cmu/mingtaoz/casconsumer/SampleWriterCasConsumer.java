@@ -17,6 +17,7 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceProcessException;
 
+import edu.cmu.mingtaoz.type.Banner;
 import edu.cmu.mingtaoz.type.Lingpipe;
 
 /**
@@ -29,6 +30,8 @@ public class SampleWriterCasConsumer extends CasConsumer_ImplBase {
 
   public static final String PARAM_OUTPUTFILE = "OutputFile";
 
+  private static int i;
+  
   private File mOutputFile;
   
   private FileWriter out;
@@ -82,6 +85,7 @@ public class SampleWriterCasConsumer extends CasConsumer_ImplBase {
    * @throws CASException
    */
   private void writeOneLineSampleOutput(JCas jcas) { 
+    
     try {
       String sentence = jcas.getDocumentText();
       FSIndex index = jcas.getAnnotationIndex(Lingpipe.type);
@@ -94,6 +98,21 @@ public class SampleWriterCasConsumer extends CasConsumer_ImplBase {
     } catch (Exception e) {
       e.printStackTrace();
     } 
+    
+    
+    try {
+      String sentence = jcas.getDocumentText();
+      FSIndex index = jcas.getAnnotationIndex(Banner.type);
+      Iterator iterator = index.iterator();
+      while(iterator.hasNext()){
+        Banner geneTag = (Banner) iterator.next();
+        out.write(sentence.substring(0, sentence.indexOf(" "))+"|"+geneTag.getBegin()+" "+geneTag.getEnd()+"|"+geneTag.getBanner()+"\n");
+      }
+      //System.out.println(i++);
+      out.flush();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   /**

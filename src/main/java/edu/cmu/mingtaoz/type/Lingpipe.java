@@ -11,7 +11,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** 
- * Updated by JCasGen Sat Oct 13 20:19:49 EDT 2012
+ * Updated by JCasGen Tue Oct 16 20:17:12 EDT 2012
  * XML source: /Users/mingtaozhang/Documents/workspace/hw1-mingtaoz/src/main/resources/descriptors/analysis_engine/TypeSystem.xml
  * @generated */
 public class Lingpipe extends Annotation {

@@ -17,5 +17,17 @@
         </featureDescription>
       </features>
     </typeDescription>
+    <typeDescription>
+      <name>edu.cmu.mingtaoz.type.Banner</name>
+      <description/>
+      <supertypeName>uima.tcas.Annotation</supertypeName>
+      <features>
+        <featureDescription>
+          <name>Banner</name>
+          <description>Banner existed library</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
   </types>
 </typeSystemDescription>

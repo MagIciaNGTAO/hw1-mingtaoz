@@ -14,7 +14,7 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Sat Oct 13 20:19:49 EDT 2012
+ * Updated by JCasGen Tue Oct 16 20:17:12 EDT 2012
  * @generated */
 public class Lingpipe_Type extends Annotation_Type {
   /** @generated */
