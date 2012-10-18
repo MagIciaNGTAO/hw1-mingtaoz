@@ -3,14 +3,7 @@
  */
 package edu.cmu.mingtaoz.annotator;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.BreakIterator;
 
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_component.AnalysisComponent;
@@ -21,19 +14,11 @@ import org.apache.uima.resource.ResourceInitializationException;
 
 import banner.BannerProperties;
 import banner.Sentence;
-import banner.processing.PostProcessor;
 import banner.tagging.CRFTagger;
 import banner.tagging.Mention;
-import banner.tagging.TaggedToken;
 import banner.tokenization.Tokenizer;
 
-import com.aliasi.chunk.Chunk;
-import com.aliasi.chunk.Chunker;
-import com.aliasi.chunk.Chunking;
-import com.aliasi.util.AbstractExternalizable;
-
 import edu.cmu.mingtaoz.type.Banner;
-import edu.cmu.mingtaoz.type.Lingpipe;
 
 /**
  * @author mingtaozhang
@@ -41,12 +26,11 @@ import edu.cmu.mingtaoz.type.Lingpipe;
  */
 public class BannerWrapperAnnotator extends JCasAnnotator_ImplBase {
 
-  private String propertiesFilename = "src/main/resources/data/banner.properties"; // banner.properties
+  private String propertiesFilename;// banner.properties
   
-  private String modelFilename = "src/main/resources/data/gene_model_v02.bin"; // model.bin
-  
-  private String featurePath;
+  private String modelFilename; // model.bin
 
+  private int sentenceLength;
   //private Chunker chunker;
 
   private BannerProperties properties;
@@ -58,7 +42,9 @@ public class BannerWrapperAnnotator extends JCasAnnotator_ImplBase {
    */
   public void initialize(UimaContext aContext) throws ResourceInitializationException {
     super.initialize(aContext);
-    featurePath = (String) aContext.getConfigParameterValue("featurePath");
+    propertiesFilename = (String) aContext.getConfigParameterValue("propertiesFilename");
+    modelFilename = (String) aContext.getConfigParameterValue("modelFilename");
+    sentenceLength = (Integer)aContext.getConfigParameterValue("sentenceLength");
     try {
       properties = BannerProperties.load(propertiesFilename);
       tokenizer = properties.getTokenizer();
@@ -80,23 +66,25 @@ public class BannerWrapperAnnotator extends JCasAnnotator_ImplBase {
     // Get the input text
     String line = aJCas.getDocumentText();
     String sentence = line.substring(line.indexOf(" ") + 1);
-    Sentence bsentence = new Sentence(null, sentence);
-    tokenizer.tokenize(bsentence);
-    tagger.tag(bsentence);
-    String previous = "abc";
-    for (Mention m : bsentence.getMentions()) {
-      if(m.toString().contains("GENE")
-              && !m.toString().contains(previous)){
-        Banner annotation = new Banner(aJCas);
-        String rawGene = m.toString();//sentence.substring(t.getToken().getStart(), t.getToken().getEnd());
-        String gene = rawGene.substring(rawGene.indexOf(" ") + 1);
-        int begin = sentence.indexOf(gene);
-        int end = sentence.indexOf(gene) + gene.length();
-        annotation.setBegin(begin- getPreviousNumOfSpace(sentence, begin));
-        annotation.setEnd(end - getPreviousNumOfSpace(sentence, begin) - getNumOfSpace(gene) - 1);
-        annotation.setBanner(gene);
-        previous = gene;
-        annotation.addToIndexes();
+    if(sentence.length() <= sentenceLength){
+      Sentence bsentence = new Sentence(null, sentence);
+      tokenizer.tokenize(bsentence);
+      tagger.tag(bsentence);
+      String previous = "abc";
+      for (Mention m : bsentence.getMentions()) {
+        if(m.toString().contains("GENE")
+                && !m.toString().contains(previous)){
+          Banner annotation = new Banner(aJCas);
+          String rawGene = m.toString();//sentence.substring(t.getToken().getStart(), t.getToken().getEnd());
+          String gene = rawGene.substring(rawGene.indexOf(" ") + 1);
+          int begin = sentence.indexOf(gene);
+          int end = sentence.indexOf(gene) + gene.length();
+          annotation.setBegin(begin- getPreviousNumOfSpace(sentence, begin));
+          annotation.setEnd(end - getPreviousNumOfSpace(sentence, begin) - getNumOfSpace(gene) - 1);
+          annotation.setBanner(gene);
+          previous = gene;
+          annotation.addToIndexes();
+        }
       }
     }
   }

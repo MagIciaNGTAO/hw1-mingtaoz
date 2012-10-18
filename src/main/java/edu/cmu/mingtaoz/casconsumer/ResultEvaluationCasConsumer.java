@@ -93,7 +93,7 @@ public class ResultEvaluationCasConsumer extends CasConsumer_ImplBase {
       System.out.println("-------------------------------------------------------");
       System.out.println();
     } catch (Exception e) {
-      System.out.println("evaluation is only available for sample.out file");
+      System.out.println("evaluation is only available for sample.in/out process");
     }
   }
 }

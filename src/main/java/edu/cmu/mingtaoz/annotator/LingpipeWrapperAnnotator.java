@@ -29,12 +29,14 @@ public class LingpipeWrapperAnnotator extends JCasAnnotator_ImplBase {
 
   private Chunker chunker;
 
+  private int sentenceLength;
   /**
    * @see AnalysisComponent#initialize(UimaContext)
    */
   public void initialize(UimaContext aContext) throws ResourceInitializationException {
     super.initialize(aContext);
     featurePath = (String) aContext.getConfigParameterValue("featurePath");
+    sentenceLength = (Integer)aContext.getConfigParameterValue("sentenceLength");
     try {
       chunker = (Chunker) AbstractExternalizable.readObject(new File(featurePath));
     } catch (Exception e) {
@@ -52,14 +54,16 @@ public class LingpipeWrapperAnnotator extends JCasAnnotator_ImplBase {
   public void process(JCas aJCas) throws AnalysisEngineProcessException {
     String line = aJCas.getDocumentText();
     String sentence = line.substring(line.indexOf(" ") + 1);
-    Chunking chunking = chunker.chunk(sentence);
-    for (Chunk c : chunking.chunkSet()) {
-      Lingpipe annotation = new Lingpipe(aJCas);
-      String gene = sentence.substring(c.start(), c.end());
-      annotation.setBegin(c.start() - getPreviousNumOfSpace(sentence, c.start()));
-      annotation.setEnd(c.end() - getPreviousNumOfSpace(sentence, c.start()) - getNumOfSpace(gene) - 1);
-      annotation.setLingpipe(gene);
-      annotation.addToIndexes();
+    if(sentence.length() > sentenceLength){
+      Chunking chunking = chunker.chunk(sentence);
+      for (Chunk c : chunking.chunkSet()) {
+        Lingpipe annotation = new Lingpipe(aJCas);
+        String gene = sentence.substring(c.start(), c.end());
+        annotation.setBegin(c.start() - getPreviousNumOfSpace(sentence, c.start()));
+        annotation.setEnd(c.end() - getPreviousNumOfSpace(sentence, c.start()) - getNumOfSpace(gene) - 1);
+        annotation.setLingpipe(gene);
+        annotation.addToIndexes();
+      }
     }
   }
 

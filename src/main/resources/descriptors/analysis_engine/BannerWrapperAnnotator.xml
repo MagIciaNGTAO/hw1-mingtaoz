@@ -10,17 +10,41 @@
     <vendor/>
     <configurationParameters>
       <configurationParameter>
-        <name>featurePath</name>
+        <name>propertiesFilename</name>
         <type>String</type>
+        <multiValued>false</multiValued>
+        <mandatory>false</mandatory>
+      </configurationParameter>
+      <configurationParameter>
+        <name>modelFilename</name>
+        <type>String</type>
+        <multiValued>false</multiValued>
+        <mandatory>false</mandatory>
+      </configurationParameter>
+      <configurationParameter>
+        <name>sentenceLength</name>
+        <type>Integer</type>
         <multiValued>false</multiValued>
         <mandatory>false</mandatory>
       </configurationParameter>
     </configurationParameters>
     <configurationParameterSettings>
       <nameValuePair>
-        <name>featurePath</name>
+        <name>propertiesFilename</name>
+        <value>
+          <string>src/main/resources/data/banner.properties</string>
+        </value>
+      </nameValuePair>
+      <nameValuePair>
+        <name>modelFilename</name>
         <value>
           <string>src/main/resources/data/gene_model_v02.bin</string>
+        </value>
+      </nameValuePair>
+      <nameValuePair>
+        <name>sentenceLength</name>
+        <value>
+          <integer>200</integer>
         </value>
       </nameValuePair>
     </configurationParameterSettings>

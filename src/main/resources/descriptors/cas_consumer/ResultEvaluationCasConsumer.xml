@@ -55,7 +55,7 @@
       <nameValuePair>
         <name>ResultPath</name>
         <value>
-          <string>src/main/resources/data/hw1-mingtaoz.out</string>
+          <string>src/main/resources/data/hw1-mingtaoz-sample.out</string>
         </value>
       </nameValuePair>
     </configurationParameterSettings>

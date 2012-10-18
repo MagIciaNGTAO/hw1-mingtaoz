@@ -30,7 +30,7 @@ public class SampleWriterCasConsumer extends CasConsumer_ImplBase {
 
   public static final String PARAM_OUTPUTFILE = "OutputFile";
 
-  private static int i;
+  //private static int i; count to monitor the process
   
   private File mOutputFile;
   
