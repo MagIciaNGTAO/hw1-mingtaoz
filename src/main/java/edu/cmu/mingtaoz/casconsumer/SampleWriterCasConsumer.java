@@ -42,7 +42,7 @@ public class SampleWriterCasConsumer extends CasConsumer_ImplBase {
    * 
    */
   public void initialize() throws ResourceInitializationException {
-    mOutputFile = new File((String) getConfigParameterValue(PARAM_OUTPUTDIR) + "/" + (String) getConfigParameterValue(PARAM_OUTPUTFILE));
+    mOutputFile = new File((String) getConfigParameterValue(PARAM_OUTPUTDIR) + (String) getConfigParameterValue(PARAM_OUTPUTFILE));
     if (!mOutputFile.exists()) {
       try {
         mOutputFile.createNewFile();

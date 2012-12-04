@@ -21,6 +21,8 @@ package edu.cmu.mingtaoz.cpe;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Scanner;
 
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
@@ -77,6 +79,7 @@ public class FileSystemCollectionReader extends CollectionReader_ImplBase {
 
   private int mCurrentIndex;
 
+
   /**
    * 
    * initialized the collection reader, read the file and initilize several private members
@@ -85,7 +88,7 @@ public class FileSystemCollectionReader extends CollectionReader_ImplBase {
   public void initialize() throws ResourceInitializationException {
     File directory = new File(((String) getConfigParameterValue(PARAM_INPUTDIR)));
     mEncoding  = (String) getConfigParameterValue(PARAM_ENCODING);
-    mFile = new File(directory + "/" + (String) getConfigParameterValue(PARAM_INPUTFILE));
+    mFile = new File(directory + (String) getConfigParameterValue(PARAM_INPUTFILE));
     mCurrentIndex = 0;
     String text = null;
     try {

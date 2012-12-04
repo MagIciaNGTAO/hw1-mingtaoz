@@ -32,13 +32,13 @@
       <nameValuePair>
         <name>propertiesFilename</name>
         <value>
-          <string>src/main/resources/data/banner.properties</string>
+          <string>data/banner.properties</string>
         </value>
       </nameValuePair>
       <nameValuePair>
         <name>modelFilename</name>
         <value>
-          <string>src/main/resources/data/gene_model_v02.bin</string>
+          <string>data/gene_model_v02.bin</string>
         </value>
       </nameValuePair>
       <nameValuePair>

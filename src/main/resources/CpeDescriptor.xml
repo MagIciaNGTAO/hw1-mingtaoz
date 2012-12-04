@@ -70,6 +70,7 @@
             </errorHandling>
             <checkpoint batch="10000"/>
         </casProcessor>
+        <!-- 
         <casProcessor deployment="integrated" name="Result Evaluation Consumer">
             <descriptor>
                 <import location="descriptors/cas_consumer/ResultEvaluationCasConsumer.xml"/>
@@ -83,6 +84,7 @@
             </errorHandling>
             <checkpoint batch="10000"/>
         </casProcessor>
+         -->
     </casProcessors>
     <cpeConfig>
         <numToProcess>-1</numToProcess>

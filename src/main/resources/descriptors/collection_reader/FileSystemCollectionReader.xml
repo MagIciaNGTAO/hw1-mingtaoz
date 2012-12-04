@@ -65,7 +65,7 @@
 		    <nameValuePair>
 		        <name>InputDirectory</name>
 		        <value>
-		            <string>src/main/resources/data/</string>
+		            <string></string>
 		        </value>
 		    </nameValuePair>
 		    <nameValuePair>
